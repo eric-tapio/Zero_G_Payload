@@ -3,6 +3,7 @@ Zero G Setup Instructions
 1) start up, log in, setup user account, and install updates
    Use zerog as the user and PW
 
+2) git clone https://github.com/eric-tapio/Zero_G_Payload.git
 
 2) Configure the RTC to be a device utilized by the system
    a) sudo i2cdetect -y 1
