@@ -1,0 +1,7 @@
+[Desktop Entry]
+Name=Sync System Time
+Exec=/home/zerog/Zero_G_Payload/Scripts/sync_RTC_time.sh
+Comment=
+Terminal=true
+Icon=/home/zerog/Zero_G_Payload/Scripts/Resources/Sync_Time_Icon.png
+Type=Application

@@ -1,0 +1,7 @@
+[Desktop Entry]
+Name=Stop Automatic Run
+Exec=/home/zerog/Zero_G_Payload/Scripts/stop_zero_g_experiment_unit_service.sh
+Comment=
+Terminal=true
+Icon=/home/zerog/Zero_G_Payload/Scripts/Resources/Stop_Automatic_Run_Icon.png
+Type=Application

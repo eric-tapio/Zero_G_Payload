@@ -1,0 +1,7 @@
+[Desktop Entry]
+Name=Update Payload Software
+Exec=/home/zerog/Zero_G_Payload/Scripts/update_zero_g_payload_software.sh
+Comment=
+Terminal=true
+Icon=/home/zerog/Zero_G_Payload/Scripts/Resources/Update_SW_Icon.png
+Type=Application

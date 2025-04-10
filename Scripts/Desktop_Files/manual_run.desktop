@@ -1,0 +1,7 @@
+[Desktop Entry]
+Name=Manually Run Experiment
+Exec=/home/zerog/Zero_G_Payload/Scripts/run_zero_g_experiment_manually.sh
+Comment=
+Terminal=true
+Icon=/home/zerog/Zero_G_Payload/Scripts/Resources/Manual_Run_Icon.png
+Type=Application
