@@ -51,17 +51,12 @@ JsonFileIo = JsonFileIO()
 bno055_cal_file_dir = "/home/zerog/Zero_G_Payload/Sensor_Calibration_Data"
 bno055_cal_filename = "BNO055_Calibration_File.json"
 
-# Uncomment these lines for UART interface connection
-# uart = board.UART()
-# sensor = adafruit_bno055.BNO055_UART(uart)
-
 # Instantiate I2C interface connection
 i2c = board.I2C()  # For board.SCL and board.SDA
-#i2c = board.STEMMA_I2C()  # For the built-in STEMMA QT connection
 sensor = adafruit_bno055.BNO055_I2C(i2c)
 sensor.mode = Mode.NDOF_MODE  # Set the sensor to NDOF_MODE
 
-print("\n ~ Performing Zero G BNO055 Sensor Calibration ...")
+print("\n ~ Performing Zero G Payload BNO055 Sensor Calibration ...")
 
 if (0):
 	print("\n ~ BEFORE CALIBRATION:")
@@ -72,7 +67,6 @@ if (0):
 
 print("\n ~ Magnetometer Calibration Step: Step 1 of 3")
 print("    Holding the Experiment Unit, rotate it slowly in a figure-eight pattern until calibrated ...")
-#print("Magnetometer: Perform the figure-eight calibration dance.")
 while not sensor.calibration_status[3] == 3:
 	# Calibration Dance Step One: Magnetometer
 	#   Move sensor away from magnetic interference or shields
@@ -84,18 +78,17 @@ time.sleep(1)
 
 
 print("\n ~ Accelerometer Calibration Step: Step 2 of 3")
-print("    Hold the Experiment Unit in each of the six stable positions below for a few seconds each:")
+print("    Hold the Experiment Unit in each of the following six primary orientations below for a several seconds each:")
 print("    	1) x-axis right, y-axis up,    z-axis away")
 print("    	2) x-axis up,	 y-axis left,  z-axis away")
 print("    	3) x-axis left,  y-axis down,  z-axis away")
 print("    	4) x-axis down,  y-axis right, z-axis away")
 print("    	5) x-axis left,  y-axis right, z-axis up")
 print("    	6) x-axis right, y-axis left,  z-axis down")
-print("    The order of the six stable positions does not matter.")
-print("    Repeat the six stable position steps until calibrated ...")
+print("    The order of the six primary orientations does not matter.")
+print("    Repeat the six primary orienations steps until calibrated ...")
 
 
-#print("Accelerometer: Perform the six-step calibration dance.")
 while not sensor.calibration_status[2] == 3:
 	# Calibration Dance Step Two: Accelerometer
 	#   Place sensor board into six stable positions for a few seconds each:
@@ -113,10 +106,9 @@ time.sleep(1)
 
 
 print("\n ~ Gyroscope Calibration Step: Step 3 of 3")
-print("    Hold the Experiment Unit in any of the six stable position for a few seconds:")
-print("    Repeat until calibrated ...")
+print("    Place the Experiment Unit down on a surface and leave stationary until calibrated ...")
+time.sleep(4)
 
-#print("Gyroscope: Perform the hold-in-place calibration dance.")
 while not sensor.calibration_status[1] == 3:
 	# Calibration Dance Step Three: Gyroscope
 	#  Place sensor in any stable position for a few seconds
@@ -128,8 +120,6 @@ time.sleep(1)
 
 print("\n ~ Calibration Complete!\n")
 
-#print("\n ~ AFTER CALIBRATION COMPLETED:")
-#print("Insert these preset offset values into project code:")
 print("\n ~ Calibration data that will be used during sensor operation:")
 print(f"  Offsets_Magnetometer:  {sensor.offsets_magnetometer}")
 print(f"  Offsets_Gyroscope:	 {sensor.offsets_gyroscope}")
@@ -150,5 +140,3 @@ JsonFileIo.writeJsonFile(bno055_cal_file_dir, bno055_cal_filename, data)
 if (READ_BACK_JSON_FILE):
 	# Read the saved JSON data
 	JsonFileIo.read_data = JsonFileIo.readJsonFile(bno055_cal_file_dir, bno055_cal_filename)
-
-#print("\n\n ~ Fini! \n\n")

@@ -1,4 +1,6 @@
+4/11/2025
 Zero G Payload Setup Instructions
+By Eric Tapio
 
 1) Power on, start up, and log-into the Raspberry Pi Zero 2
      If this is the first time configuring the Raspberry Pi
@@ -95,43 +97,32 @@ ExecStop=sh -c "echo 1 | sudo tee /sys/class/leds/ACT/brightness > /dev/null"
 WantedBy=multi-user.target
 
 12) Test the turn off RPi LED service
-   sudo ./zero_g_startup_script.sh
+   ~/Zero_G_Payload/Scripts/start_disable_rpi_power_led_service.sh 
 
    Should see:
-   Created symlink /etc/systemd/system/default.target.wants/zero_g_startup.service → /etc/systemd/system/zero_g_startup.service.
+   Created symlink /etc/systemd/system/multi-user.target.wants/disable_rpi_power_led.service → /etc/systemd/system/disable_rpi_power_led.service.
 
+13) Make the Payload Control .desktop files accessible on the Menu Bar.  To do this:
 
+    a) Create a new applications directory
+        sudo mkdir /usr/share/applications/Zero_G_Payload
 
+    b) Copy the desktop files to the newly created applications directory
+        cd /usr/share/applications/Zero_G_Payload
+        sudo cp ~/Zero_G_Payload/Scripts/Desktop_Files/* .
 
-11) Configure the code as needed, such as IS_EXP_UNIT
+14) For each desktop item, which shows up under "Other" in the Menu Bar, Add to Desktop and arrange in logical order (Update SW, Sync Time, Calibrate Sensor, Stop Automatic Run, Run Manually, Start Automatic Run)
 
-7) Run the code locally (stopping the service first)
+15) Test the desktop shortcuts one at at time starting at the top
 
+16) Configure the Payload code as needed, such as IS_EXP_UNIT
 
-Turn Wifi and Bluetooth off
-Remove Web from launchbar
-Configure web bar
+17) Turn Wifi and Bluetooth off
 
-Add a new Menu Item named Zero_G_Payload
+18) Remove Web from launchbar
 
-Create a new applications directory
-sudo mkdir /usr/share/applications/Zero_G_Payload
+19) Delete any files and/or directories, as needed
 
-Copy the desktop files to the newly created applications directory
-cd /usr/share/applications/Zero_G_Payload
-sudo cp ~/Zero_G_Payload/Scripts/Desktop_Files/* .
+20) Empty the Trash
 
-
-Add /home/zerog/Zero_G_Payload/Scripts/run_zero_g_experiment_manually.sh to the repo
-Add update_zero_g_payload_software.sh to the repo
-Add RPI Power LED services .sh files to the repo
-Add this updated instruction set to the repo
-
-
-
-
-For each desktop item, which shows up under "Other" in the Menu Bar, Add to Desktop
-
-Delete files and/or directories, as neededs
-Empty the Trash
-
+21) Celebrate! You've successfully completed setup

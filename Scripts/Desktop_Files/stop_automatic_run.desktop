@@ -1,5 +1,5 @@
 [Desktop Entry]
-Name=Stop Automatic Run
+Name=Stop Auto Exp Run
 Exec=/home/zerog/Zero_G_Payload/Scripts/stop_zero_g_experiment_unit_service.sh
 Comment=
 Terminal=true

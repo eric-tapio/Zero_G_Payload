@@ -1,11 +1,16 @@
 #!/bin/bash
 echo " ~ Sync'ing the Real Time Clock (RTC) with the current Raspberry Pi Time ..."
-echo " ~ Verify that the Raspberry Pi is connected to Wifi for proper time sync ..."
 echo ""
+echo " ~ Before connecting to the time server, verify that Wifi is turned ON ..."
+echo " ~ Press any key to continue ..."
+read -n 1 -s -r
 
+echo ""
 sudo hwclock --verbose -w
+echo ""
 
 echo " ~ RTC time sync completed!"
 echo ""
-echo " ~ You may now turn OFF the Raspberry Pi WiFi"
-echo ""
+echo " ~ Wifi may now be turned OFF ..."
+echo " ~ Press any key to close this window ..."
+read -n 1 -s -r

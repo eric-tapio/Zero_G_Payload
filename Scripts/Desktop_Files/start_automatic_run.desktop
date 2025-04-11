@@ -1,5 +1,5 @@
 [Desktop Entry]
-Name=Start Automatic Run
+Name=Start Auto Exp Run
 Exec=/home/zerog/Zero_G_Payload/Scripts/start_zero_g_experiment_unit_service.sh
 Comment=
 Terminal=true

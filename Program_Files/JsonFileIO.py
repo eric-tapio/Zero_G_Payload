@@ -12,7 +12,7 @@ class JsonFileIO:
 
 
 	def print(self):
-		print(" ~ Printing FileIO ... ")
+		print(" ~ Printing JsonFileIO ... ")
 		print("	 Full Filename is: " + str(self.full_src_file_name))
 	 
 
@@ -26,8 +26,9 @@ class JsonFileIO:
 
 		with open(self.full_src_file_name, 'w') as json_file:
 			json.dump(data, json_file, indent=4)
-	 
-		print(" ~ JSON file written ...")
+		
+		if (VERBOSE_OUTPUT):	 
+			print(" ~ JSON file written ...")
 
 		return
 
@@ -83,7 +84,8 @@ class JsonFileIO:
 		
 		try:
 			os.makedirs(dir_path, exist_ok = True)
-			print(" ~ Directory '%s' created successfully" % dir_path)
+			if (VERBOSE_OUTPUT):
+				print(" ~ Directory '%s' created successfully" % dir_path)
 		except OSError as error:
 			print(" ~ Directory '%s' can not be created" % dir_path)
 
@@ -93,10 +95,7 @@ class JsonFileIO:
 	def fileExists(self, file_path):
 		if (VERBOSE_OUTPUT):
 			print(" ~ Determining if file exists ...")
-		return os.path.isfile(file_path) 
-	  
-
-
+		return os.path.isfile(file_path)
 	
 	
 if __name__ == '__main__':

@@ -46,34 +46,21 @@ STANDBY_STATE_SW_VALUE = LOW_VALUE
 INIT_MODE = 0
 STANDBY_MODE = 1
 RECORD_MODE = 2
+MAX_NUMBER_ATTEMPTS = 20
 
 VERBOSE_MODE = False
-
+DISPLAY_WARNINGS = False
 
 IS_EXP_UNIT = 0
 IS_AUX_SENSOR_UNIT = 0
 IS_EXP_AND_AUX_SUPERSET_UNIT = 1
+USE_LCD = False
 
 TELEMETRY_FILE_HEADER = "Date [yyyy-dd-mm],Time [HH:MM:SS.SS],Temp [deg C],Humidity [%],Pressure [hPa],Altitude [m],Quaternion Quality [unitless], Quaternion_i [unitless],Quaternion_j [unitless],Quaternion_k [unitless],Quaternion_w [unitless],Gyro Quality [unitless],Gyro_x [rad/sec],Gyro_y [rad/sec] ,Gyro_z [rad/sec], Accelerometer Quality [unitless],Accel_x [rad/sec^2],Accel_y [rad/sec^2], Accel_z [rad/sec^2],G_x [rad/sec^2],G_y [rad/sec^2],G_z [rad/sec^2],Magnetometer Quality [unitless],M_x [Teslas],M_y [Teslas],M_z [Teslas]"
 ACTION_FILE_HEADER = "Date [yyyy-dd-mm],Time [HH:MM:SS.SS],Action"
 BATTERY_TELEMETRY_FILE_HEADER = "Date [yyyy-dd-mm],Time [HH:MM:SS.SS],Battery Voltage [V],Battery Level [%]"
 
-RECORD_TELEMETRY_DELTA_T_IN_SEC = 0.5
-
-
-#TEMP_TLM = 24.5
-#HUMIDITY_TLM = 34.5
-#PRESSURE_TLM = 996.8
-#ALTITUDE_TLM = 101.62
-#QUATERNION_QUALITY_TLM = 2
-#QUATERNION_TLM = (0.5, 0.5, 0.5, 0.5)
-#GYRO_QUALITY_TLM = 3
-#GYRO_TLM = (0.22, 0.33, 0.44)
-#ACCEL_QUALITY_TLM = 2
-#ACCEL_TLM = "(0.1, 0.7, 0.2)"
-#GRAVITY_TLM = (0.8, 0.1, 0.1)
-#MAGNETOMETER_QUALITY_TLM = 1
-#MAGNETOMETER_TLM = (0.33, 0.33, 0.33)
+#RECORD_TELEMETRY_DELTA_T_IN_SEC = 0.5
 
 
 class ZeroGUnit():
@@ -93,8 +80,11 @@ class ZeroGUnit():
 		self.bno055_cal_file_dir = "/home/zerog/Zero_G_Payload/Sensor_Calibration_Data"
 		self.bno055_cal_filename = "BNO055_Calibration_File.json"
 		self.VH = VideoHandler(self.video_output_dir)
-		self.VH.print()
-		self.LH = LcdHandler()
+		if (VERBOSE_MODE):					
+			self.VH.print()
+
+		if (USE_LCD):
+			self.LH = LcdHandler()
 
 		self.printUnitIdentity()
 
@@ -141,7 +131,8 @@ class ZeroGUnit():
 		#print(" ~ In __transitionToInitMode, self.current_date is: " + str(self.current_date))
 
 		# Start SPI devices
-		self.LH.startLcdDisplay()
+		if (USE_LCD):
+			self.LH.startLcdDisplay()
 
 		# Create output directories
 		self.__createOutputDirs()
@@ -157,7 +148,6 @@ class ZeroGUnit():
 		
 		# Record the current battery telemetry
 		self.__recordBatteryTelemetry(current_time)
-
 
 		return
 
@@ -180,8 +170,9 @@ class ZeroGUnit():
 		# Turn green LED on and red LED off
 		self.__setLedState(GREEN_LED_PIN, HIGH_VALUE)
 		self.__setLedState(RED_LED_PIN, LOW_VALUE)
-
-		self.__updateLcdDisplay()
+		
+		if (USE_LCD):
+			self.__updateLcdDisplay()
 
 		# Stop video recording
 		self.__stopVideoRecording()
@@ -209,7 +200,8 @@ class ZeroGUnit():
 		self.__setLedState(GREEN_LED_PIN, LOW_VALUE)
 		self.__setLedState(RED_LED_PIN, HIGH_VALUE)
 
-		self.__updateLcdDisplay()
+		if (USE_LCD):
+			self.__updateLcdDisplay()
 		
 		# Start video recording
 		self.__startVideoRecording(current_time_struct)
@@ -336,9 +328,6 @@ class ZeroGUnit():
 
 		self.VH.startRecording(current_time)
 
-		#if (VERBOSE_MODE):
-		#	print(" ~ Video file name is: " + str(video_file_name))
-
 		return
 
 
@@ -361,12 +350,6 @@ class ZeroGUnit():
 			print(" ~ Data file name is: " + str(data_file_name))
 
 		return data_file_name
-
-
-	#def __stopDataRecording(self):
-	#	if (VERBOSE_MODE):
-	#		print(" ~ Stopping Data Recording ...")
-	#	return
 
 
 	def __generateBatteryTelemetryFileName(self):
@@ -499,23 +482,6 @@ class ZeroGUnit():
 		return sw_state
 
 
-# Duplicate function
-#	def __getVideoRecordInputState(self):
-#		if (VERBOSE_MODE):
-#			print(" ~ Getting Video Record Input State ...")
-#		
-#		input_state = GPIO.input(REC_CONTROL_INPUT_PIN)
-#
-#		return input_state
-
-
-	#def __initSystemTime(self):
-	#	if (VERBOSE_MODE):
-	#		print(" ~ Initializing System Time ...")
-	#	return
-
-
-
 	def __setLedState(self, pin_num, state):
 		if (VERBOSE_MODE):
 			print(" ~ Setting LED State ...")
@@ -524,28 +490,12 @@ class ZeroGUnit():
 		return
 
 
-	#def __displayMessage(self):
-	#	if (VERBOSE_MODE):
-	#		print(" ~ Displaying Message ...")
-	#	return
-
-
 	def startUnit(self):
 		if (VERBOSE_MODE):
 			print(" ~ Starting Unit ...")
 		
-		#try:
-		#	print(" ~ Trying the try ...")
 		self.__runUnit()
-		#except KeyboardInterrupt:
-		#	print(" ~ A keyboard Interrupt was encountered, so exiting and cleaning up ... ")
-		#except:		
-		#	print(" ~ Houston we have a problem, so alert the user ...")
-		#	#self.__blinkLedsError()
-		#else: 
-		#	print(" ~ Everything worked great!")
-
-		#finally:
+		return
 
 
 	def stopUnit(self):
@@ -566,8 +516,10 @@ class ZeroGUnit():
 		self.ActFileIo.closeFile()
 		
 		# Exit the Display
-		self.LH.stopLcdDisplay()
+		if (USE_LCD):
+			self.LH.stopLcdDisplay()
 		# OR Display an Error message
+		return
 
 
 	def blinkLedsError(self):
@@ -607,7 +559,8 @@ class ZeroGUnit():
 		while (1):
 			if (1):			
 				self.__performModeIteration()
-				time.sleep(RECORD_TELEMETRY_DELTA_T_IN_SEC)
+				# Record data with the smallest delta time supported				
+				#time.sleep(RECORD_TELEMETRY_DELTA_T_IN_SEC)
 			else:
 				# This does not work reliably since camera uses threading
 				self.__call_repeatedly_with_delta_time(RECORD_TELEMETRY_DELTA_T_IN_SEC, self.__performModeIteration)
@@ -620,6 +573,7 @@ class ZeroGUnit():
 			threading.Timer(interval, infinite_loop).start()
 			function_to_call()
 		infinite_loop()
+
 
 
 	def __performModeIteration(self):
@@ -650,7 +604,8 @@ class ZeroGUnit():
 			if (VERBOSE_MODE):
 				print(" ~ Current mode is: " + str(self.current_mode) + " and rec_sw_state is: " + str(rec_sw_state))
 			
-			self.__updateLcdDisplay()
+			if (USE_LCD):
+				self.__updateLcdDisplay()
 
 		return
 
@@ -675,7 +630,7 @@ class ZeroGUnit():
 
 	def __performSensorTelemetryIteration(self):
 
-		for iteration in range(20):
+		for iteration in range(MAX_NUMBER_ATTEMPTS):
 			if (VERBOSE_MODE):
 				print(" ~ Get Sensor Telemetry iteration is: " + str(iteration))
 
@@ -687,7 +642,7 @@ class ZeroGUnit():
 				self.TlmFileIo.writeStrToFile(sensor_tlm_str)
 				break
 			
-			if (iteration == 20-1):
+			if (iteration == MAX_NUMBER_ATTEMPTS-1):
 				print(" ~ WARNING: No good Sensor TLM in MAX Iterations ...")
 
 
@@ -719,7 +674,8 @@ class ZeroGUnit():
 				print("   tlm_concatenated_str is: " + tlm_concatenated_str)
 
 		except:
-			print(" ~ WARNING: Encountered Exception in __getSensorTelemetry ...")
+			if (DISPLAY_WARNINGS):
+				print(" ~ WARNING: Encountered Exception in __getSensorTelemetry ...")
 			return (1, "")
 		
 		else: 
@@ -749,8 +705,8 @@ class ZeroGUnit():
 #		self.rtc.datetime = t
 #		print(" ~ RTC time sycn'ed!")
 #		return
-#
-#
+
+
 	def getRtcTimeStruct(self):
 		if (VERBOSE_MODE):
 			print(" ~ Getting RTC Time Struct ...")
@@ -799,7 +755,7 @@ class ZeroGUnit():
 		# When using the Raspberry Pi time set by the RTC
 		current_time = datetime.now()
 		formatted_date = ("%d%c%d%c%d" % (current_time.year, delimeter, current_time.month, delimeter, current_time.day))
-		#
+		
 		return formatted_date
 
 
@@ -859,145 +815,15 @@ class ZeroGUnit():
 		self.bno055_gyro_tlm = tuple(round(x, 6) for x in self.bno055.gyro)
 		self.bno055_linear_accel_tlm = tuple(round(x, 6) for x in self.bno055.linear_acceleration)
 
-
-	def __loadBno055Offsets(self):
-		#bno055.offsets_magnetometer
-		#bno055.offsets_accelerometer
-		# TBD
 		return
 
 
-
-	def performSelfTest(self):
-		if (1):
-			print(" ~ Performing Self Test ...")
-
-		self.__selfTestI2CDevices()
-
-		return
-
-
-	def __selfTestI2CDevices(self):
-		if (1):
-			print(" ~ Running Self Test on I2C Devices ...")
-
-		self.i2c = board.I2C()
-		rtc_status_code = self.__selfTestRtcI2CDevice()
-		bme_status_code = self.__selfTestBme280I2CDevice()
-		bno_status_code = self.__selfTestBno055I2CDevice()
-		ads_status_code = self.__selfTestAds1113I2CDevice()
-		
-		return (rtc_status_code, bme_status_code, bno_status_code, ads_status_code)
-
-
-#	def __selfTestRtcI2CDevice(self):
-#		if (1):
-#			print(" ~ Running Self Test on RTC I2C Device ...")
-#
-#		try:
-#			self.rtc = adafruit_ds1307.DS1307(self.i2c)
-#
-#		except:
-#			print("   - ERROR: RTC start result: FAILED!")
-#			return 1
-#
-#		else:
-#			print("   - RTC start result: PASSED")
-#			
-#			# Then get the RTC time struct
-#			self.getRtcTimeStruct()
-#
-#			return 0
-
-
-	def __selfTestBme280I2CDevice(self):
-		if (1):
-			print(" ~ Running Self Test on BME280 I2C Device ...")
-
-		try:
-			self.bme280 = adafruit_bme280.Adafruit_BME280_I2C(self.i2c)
-
-		except:
-			print("   - ERROR: BME280 start result: FAILED!")
-			return 1
-
-		else:
-			print("   - BME280 start result: PASSED")
-			
-			# Then get the BME280 telemetry
-			self.__getBme280Telemetry()
-
-			return 0
-
-
-	def __selfTestBno055I2CDevice(self):
-		if (1):
-			print(" ~ Running Self Test on BNO055 I2C Device ...")
-
-		try:
-			self.bno055 = adafruit_bno055.BNO055_I2C(self.i2c)
-
-		except:
-			print("   - ERROR: BNO055 start result: FAILED!")
-			return 1
-
-		else:
-			print("   - BNO055 start result: PASSED")
-			
-			# Then get the BNO055 telemetry
-			self.__getBno055Telemetry()
-
-			return 0
-
-
-	def __selfTestAds1113I2CDevice(self):
-		if (1):
-			print(" ~ Running Self Test on ADS1113 I2C Device ...")
-
-		try:
-			self.ads1113 = ADS.ADS1115(self.i2c, address=ADC_ADDRESS, gain=1)
-
-		except:
-			print("   - ERROR: ADS1113 start result: FAILED!")
-			return 1
-
-		else:
-			print("   - ADS1113 start result: PASSED")
-			
-			# Then get the ADS1113 telemetry
-			self.__getBatteryTelemetry()
-
-			return 0
-
-		# # Addr 0x77
-		#
-		#
-
-
-
-
-
-
-print(" ~ Running Zero G Unit ...\n")
+# The Run Zero G Payload Experiment Program starts here --> X
+print(" ~ Running Zero G Payload Experiment Unit ...\n")
 
 zgu = ZeroGUnit(True)
-#zgu.syncRtcTime()
-#zgu.getRtcTimeStruct()
-#zgu.startUnit()
-#zgu.print()
-#time.sleep(5)
-
-# Syncing the RTC
-#zgu.getRtcTimeStruct()
-
-if (0):
-	# Sync the RTC's time with the current system time
-	zgu.syncRtcTime()
-
-#zgu.getRtcTimeStruct()
 
 try:
-	print(" ~ Trying the try ...")
 	zgu.startUnit()
 
 except KeyboardInterrupt:
@@ -1005,12 +831,11 @@ except KeyboardInterrupt:
 	zgu.stopUnit()
 
 except:
-	print(" ~ Houston we have a problem, so alert the user ...")
+	print(" ~ Houston we have a problem, so alerting the user ...")
 	zgu.blinkLedsError()
 else: 
 	print(" ~ Congrats, everything worked great!")
 
 #finally:
-
 
 print("\n ~ Fini! \n")
