@@ -24,8 +24,10 @@ from VideoHandler import *
 from LcdHandler import *
 from JsonFileIO import *
 
-RED_LED_PIN = 15
-GREEN_LED_PIN = 14
+RED_LED_PIN = 22
+GREEN_LED_PIN = 23
+EXP_LIGHT_PIN = 27
+
 REC_SWITCH_INPUT_PIN = 0
 REC_CONTROL_INPUT_PIN = 4
 REC_SENSE_INPUT_PIN = 27
@@ -39,6 +41,7 @@ HIGH_VALUE = 1
 LOW_VALUE = 0
 
 ADC_ADDRESS = 0x48
+ADC_GAIN = 2
 
 RECORD_STATE_SW_VALUE = HIGH_VALUE
 STANDBY_STATE_SW_VALUE = LOW_VALUE
@@ -54,7 +57,7 @@ DISPLAY_WARNINGS = False
 IS_EXP_UNIT = 0
 IS_AUX_SENSOR_UNIT = 0
 IS_EXP_AND_AUX_SUPERSET_UNIT = 1
-USE_LCD = False
+USE_LCD = False #True # False since using handheld units
 
 TELEMETRY_FILE_HEADER = "Date [yyyy-dd-mm],Time [HH:MM:SS.SS],Temp [deg C],Humidity [%],Pressure [hPa],Altitude [m],Quaternion Quality [unitless], Quaternion_i [unitless],Quaternion_j [unitless],Quaternion_k [unitless],Quaternion_w [unitless],Gyro Quality [unitless],Gyro_x [rad/sec],Gyro_y [rad/sec] ,Gyro_z [rad/sec], Accelerometer Quality [unitless],Accel_x [rad/sec^2],Accel_y [rad/sec^2], Accel_z [rad/sec^2],G_x [rad/sec^2],G_y [rad/sec^2],G_z [rad/sec^2],Magnetometer Quality [unitless],M_x [Teslas],M_y [Teslas],M_z [Teslas]"
 ACTION_FILE_HEADER = "Date [yyyy-dd-mm],Time [HH:MM:SS.SS],Action"
@@ -121,8 +124,8 @@ class ZeroGUnit():
 		self.current_mode = INIT_MODE
 
 		self.__initializeSystem()
-
 		self.__loadBno055CalData()
+		self.__turnExperimentLightOff()
 
 		# Get the current date & Time
 		current_time = self.__getFormattedRtcTime(":")
@@ -170,6 +173,7 @@ class ZeroGUnit():
 		# Turn green LED on and red LED off
 		self.__setLedState(GREEN_LED_PIN, HIGH_VALUE)
 		self.__setLedState(RED_LED_PIN, LOW_VALUE)
+		self.__turnExperimentLightOff()
 		
 		if (USE_LCD):
 			self.__updateLcdDisplay()
@@ -203,6 +207,8 @@ class ZeroGUnit():
 		if (USE_LCD):
 			self.__updateLcdDisplay()
 		
+		self.__turnExperimentLightOn()
+
 		# Start video recording
 		self.__startVideoRecording(current_time_struct)
 		
@@ -220,19 +226,52 @@ class ZeroGUnit():
 		# Inputs
 		# Enable R Pi pulldowns on inputs
 
-		# Determine which rec input source to use 
-		self.__enableRecInputSource()
+		# Determine which rec input source to use
+		# For the hand-held units, this is not necessary
+		# The switch is the only source in this case
+		#self.__enableRecInputSource()
+		self.__enableRecSwitchControl()
 
 		# Outputs
 		GPIO.setup(GREEN_LED_PIN, GPIO.OUT)
 		GPIO.setup(RED_LED_PIN, GPIO.OUT)
+		GPIO.setup(EXP_LIGHT_PIN, GPIO.OUT)
 
 		# Initialize outputs
 		GPIO.output(GREEN_LED_PIN, GPIO.LOW)
 		GPIO.output(RED_LED_PIN, GPIO.LOW)
+		GPIO.output(EXP_LIGHT_PIN, GPIO.LOW)
 
 		# Start I2C devices
 		self.__startI2cDevices()
+
+		return
+
+
+	def __turnExperimentLightOn(self):
+		if (VERBOSE_MODE):
+			print(" ~ Turning ON Experiment Light ...")
+
+		GPIO.output(EXP_LIGHT_PIN, GPIO.HIGH)
+
+		return
+		
+
+	def __turnExperimentLightOff(self):
+		if (VERBOSE_MODE):
+			print(" ~ Turning OFF Experiment Light ...")
+
+		GPIO.output(EXP_LIGHT_PIN, GPIO.LOW)
+
+		return
+
+
+	def __enableRecSwitchControl(self):		
+		if (VERBOSE_MODE):
+			print(" ~ Enabling Rec Switch Control for Handheld Units ...")
+
+		GPIO.setup(REC_SWITCH_INPUT_PIN, GPIO.IN)
+		self.rec_control_input_pin_enabled = False
 
 		return
 
@@ -689,7 +728,7 @@ class ZeroGUnit():
 		self.i2c = board.I2C()
 		#self.rtc = adafruit_ds1307.DS1307(self.i2c)
 		self.bme280 = adafruit_bme280.Adafruit_BME280_I2C(self.i2c) # Addr 0x77
-		self.ads1113 = ADS.ADS1115(self.i2c, address=ADC_ADDRESS, gain=1)
+		self.ads1113 = ADS.ADS1115(self.i2c, address=ADC_ADDRESS, gain=ADC_GAIN)
 		self.bno055 = adafruit_bno055.BNO055_I2C(self.i2c)
 		return
 
